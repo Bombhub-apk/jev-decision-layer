@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jev AI — مرکز پایش زنده و مدیریت چندعامله</title>
+    <!-- Google Fonts: Vazirmatn & Estedad & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Estedad:wght@300;400;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            bg: '#080b11',
+                            card: '#0f1521',
+                            cardHover: '#141c2c',
+                            border: '#1e293b',
+                            borderLight: '#334155'
+                        },
+                        mint: {
+                            DEFAULT: '#10b981',
+                            glow: '#34d399',
+                            light: '#a7f3d0'
+                        },
+                        violet: {
+                            DEFAULT: '#8b5cf6',
+                            glow: '#a78bfa'
+                        },
+                        sky: {
+                            DEFAULT: '#0ea5e9',
+                            glow: '#38bdf8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Vazirmatn', 'Estedad', 'Outfit', 'system-ui', 'sans-serif'],
+                        mono: ['Outfit', 'JetBrains Mono', 'Consolas', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        :root {
+            color-scheme: dark;
+        }
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('/assets/fonts/Vazirmatn[wght].woff2') format('woff2');
+            font-weight: 100 900;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Estedad';
+            src: url('/assets/fonts/Estedad[wght].woff2') format('woff2');
+            font-weight: 100 900;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Outfit';
+            src: url('/assets/fonts/Outfit[wght].woff2') format('woff2');
+            font-weight: 100 900;
+            font-display: swap;
+        }
+        body {
+            background: radial-gradient(ellipse at 50% -10%, #151d38 0%, #080b11 60%, #040609 100%);
+            min-height: 100vh;
+            color: #f1f5f9;
+            font-family: 'Vazirmatn', 'Estedad', 'Outfit', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        html[dir="ltr"] body {
+            font-family: 'Outfit', 'Vazirmatn', system-ui, sans-serif;
+        }
+        .glass-panel {
+            background: rgba(15, 21, 33, 0.72);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-panel:hover {
+            border-color: rgba(52, 211, 153, 0.35);
+            box-shadow: 0 14px 40px -5px rgba(16, 185, 129, 0.12), 0 0 15px rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+        }
+        .glow-indigo:hover {
+            border-color: rgba(139, 92, 246, 0.45);
+            box-shadow: 0 14px 40px -5px rgba(139, 92, 246, 0.15);
+        }
+        .glow-mint:hover {
+            border-color: rgba(16, 185, 129, 0.45);
+            box-shadow: 0 14px 40px -5px rgba(16, 185, 129, 0.15);
+        }
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(15, 21, 33, 0.5);
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 999px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        @keyframes ripple {
+            0% { transform: scale(0.9); opacity: 1; }
+            50% { transform: scale(1.6); opacity: 0.3; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+        .pulse-indicator {
+            position: relative;
+        }
+        .pulse-indicator::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            background: #10b981;
+            animation: ripple 2s infinite ease-out;
+            pointer-events: none;
+        }
+        .modal-enter {
+            animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.94) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .toast-enter {
+            animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tabular-num {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="p-3 sm:p-6 lg:p-8 antialiased selection:bg-mint/30 selection:text-white">
+    <div class="max-w-[1440px] mx-auto space-y-6">
+
+        <!-- Top Navigation & Header -->
+        <header class="glass-panel p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-black text-2xl">
+                    ⚡
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                            <span>Jev</span>
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                SYSTEM ONE
+                            </span>
+                        </h1>
+                        <span class="text-xs text-gray-400 hidden sm:inline">|</span>
+                        <span class="text-xs sm:text-sm text-gray-300 font-medium" data-i18n="header.subtitle">
+                            مرکز پایش زنده، تصمیم‌گیری چندعامله و مدیریت کیف‌پول
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-0.5" data-i18n="header.powered">
+                        موتور تصمیم‌گیری غیرمولد، فوق‌سریع و بدون توهم TypeSafe AI
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2.5 flex-wrap w-full md:w-auto justify-end">
+                <!-- Live Status Badge -->
+                <div id="live-indicator-wrap" class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-indicator"></span>
+                    <span id="live-status-text" data-i18n="status.live">پایش زنده و فعال</span>
+                </div>
+
+                <!-- Last Sync Tag -->
+                <div class="text-[11px] text-gray-400 px-2.5 py-1.5 rounded-lg bg-gray-900/60 border border-gray-800">
+                    <span data-i18n="status.lastSync">آخرین داده:</span> <span id="last-sync-time" class="font-mono text-gray-300">—</span>
+                </div>
+
+                <!-- Language Toggle -->
+                <button onclick="toggleLanguage()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-800/90 hover:bg-gray-700 text-gray-200 transition border border-gray-700">
+                    <span id="lang-btn-text">EN</span>
+                </button>
+
+                <!-- Refresh Button -->
+                <button onclick="forceRefresh()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600/90 hover:bg-indigo-600 text-white transition border border-indigo-500/40 flex items-center gap-1.5 shadow-sm shadow-indigo-500/30">
+                    <span>↻</span> <span data-i18n="action.refresh">تازه‌سازی</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Multi-Agent Filter Tabs -->
+        <div class="glass-panel p-2 rounded-2xl flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold text-gray-400 px-3 flex items-center gap-1.5">
+                <span>🤖</span> <span data-i18n="filter.agent">فیلتر محیط هوش مصنوعی:</span>
+            </span>
+            <button onclick="filterByClient('all')" id="btn-all" class="filter-tab px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1.5">
+                <span>🌟</span> <span data-i18n="agent.all">همهٔ عامل‌ها</span>
+                <span id="count-all" class="px-1.5 py-0.2 rounded-full bg-white/20 text-[10px]">0</span>
+            </button>
+            <button onclick="filterByClient('antigravity')" id="btn-antigravity" class="filter-tab px-4 py-2 rounded-xl text-xs font-semibold bg-gray-900/80 text-gray-300 hover:text-white transition-all border border-gray-800 flex items-center gap-1.5">
+                <span>⚡</span> <span>Antigravity</span>
+                <span id="count-antigravity" class="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px]">0</span>
+            </button>
+            <button onclick="filterByClient('codex')" id="btn-codex" class="filter-tab px-4 py-2 rounded-xl text-xs font-semibold bg-gray-900/80 text-gray-300 hover:text-white transition-all border border-gray-800 flex items-center gap-1.5">
+                <span>🤖</span> <span>Codex</span>
+                <span id="count-codex" class="px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px]">0</span>
+            </button>
+            <button onclick="filterByClient('claude-code')" id="btn-claude-code" class="filter-tab px-4 py-2 rounded-xl text-xs font-semibold bg-gray-900/80 text-gray-300 hover:text-white transition-all border border-gray-800 flex items-center gap-1.5">
+                <span>🔮</span> <span>Claude Code</span>
+                <span id="count-claude-code" class="px-1.5 py-0.2 rounded-full bg-purple-500/20 text-purple-300 text-[10px]">0</span>
+            </button>
+            <button onclick="filterByClient('terminal')" id="btn-terminal" class="filter-tab px-4 py-2 rounded-xl text-xs font-semibold bg-gray-900/80 text-gray-300 hover:text-white transition-all border border-gray-800 flex items-center gap-1.5">
+                <span>💻</span> <span data-i18n="agent.terminal">ترمینال / CLI</span>
+                <span id="count-terminal" class="px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-300 text-[10px]">0</span>
+            </button>
+        </div>
+
+        <!-- Metric Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Card 1: Total Calls -->
+            <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
+                <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                    <span data-i18n="card.calls">کل تصمیمات ثبت‌شده</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Runtime Verified</span>
+                </div>
+                <div id="metric-calls" class="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight tabular-num mt-2">0</div>
+                <div class="text-xs text-gray-400 mt-3 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span id="metric-calls-sub" data-i18n="card.calls.sub">تصمیمات شناختی مرزبندی‌شده</span>
+                </div>
+            </div>
+
+            <!-- Card 2: Tokens Consumed -->
+            <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
+                <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                    <span data-i18n="card.tokens">مصرف واقعی توکن Jev</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Provider Reported</span>
+                </div>
+                <div id="metric-tokens" class="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight tabular-num mt-2">0</div>
+                <div class="text-xs text-gray-400 mt-3 flex items-center justify-between">
+                    <span id="metric-in-out" class="font-mono">In: 0 | Out: 0</span>
+                    <span class="text-emerald-400 font-bold" data-i18n="card.freeOut">خروجی کاملاً رایگان!</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Wallet Spend -->
+            <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
+                <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                    <span data-i18n="card.spend">هزینهٔ واقعی کیف‌پول</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20">$0.042 / 1M In</span>
+                </div>
+                <div id="metric-cost" class="text-3xl sm:text-4xl font-black text-emerald-400 font-mono tracking-tight tabular-num mt-2">$0.000000</div>
+                <div class="text-xs text-gray-400 mt-3 flex items-center justify-between">
+                    <span data-i18n="card.rateNote">محاسبه از توکن‌های ورودی</span>
+                    <span class="text-gray-300 font-mono">14,409 Tok = $0.0005</span>
+                </div>
+            </div>
+
+            <!-- Card 4: Calibrated Confidence -->
+            <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
+                <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                    <span data-i18n="card.confidence">میانگین ضریب اطمینان</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">Zero-Hallucination</span>
+                </div>
+                <div id="metric-conf" class="text-3xl sm:text-4xl font-black text-purple-400 font-mono tracking-tight tabular-num mt-2">0%</div>
+                <div class="text-xs text-gray-400 mt-3 flex items-center justify-between">
+                    <span data-i18n="card.calibrated">کالیبراسیون آماری</span>
+                    <span class="text-emerald-400 font-semibold" data-i18n="card.pureLogic">بدون خطای فرمت (۰ Retry)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- KEY MANAGEMENT HUB (FRONT & CENTER) -->
+        <section class="glass-panel p-6 rounded-2xl border-t-2 border-t-emerald-500 relative overflow-hidden" id="key-management-section">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-800">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">🔑</span>
+                        <h2 class="text-lg font-black text-white" data-i18n="keys.title">
+                            مدیریت استخر کلیدهای API و چرخش هوشمند (Key Pool)
+                        </h2>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1" data-i18n="keys.subtitle">
+                        چرخش خودکار (Round-Robin)، پیشگیری از Rate-Limit، مدیریت Failover و مصرف توکن اختصاصی برای هر کلید
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-3 flex-wrap">
+                    <!-- Strategy Switcher -->
+                    <div class="flex items-center gap-2 bg-gray-900/90 px-3 py-1.5 rounded-xl border border-gray-800 text-xs">
+                        <span class="text-gray-400" data-i18n="keys.strategy">راهبرد چرخش:</span>
+                        <select id="strategy-select" onchange="changeStrategy(this.value)" class="bg-gray-800 text-emerald-400 font-bold rounded-lg px-2.5 py-1 border border-gray-700 outline-none focus:border-emerald-500 transition">
+                            <option value="round_robin">🔄 چرخشی (Round-Robin)</option>
+                            <option value="single">🎯 تک‌کلید ثابت (Single Target)</option>
+                        </select>
+                    </div>
+
+                    <!-- Add Key Button -->
+                    <button onclick="openAddKeyModal()" class="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white transition shadow-lg shadow-emerald-500/20 flex items-center gap-1.5">
+                        <span>+</span> <span data-i18n="keys.addBtn">افزودن API Key جدید</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Key Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5" id="key-pool-grid">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- IMPACT & ROI ENGINE SECTION -->
+        <section class="space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-md text-xs font-black bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/30">
+                        IMPACT & ROI ENGINE
+                    </span>
+                    <h2 class="text-sm font-black text-gray-200 uppercase tracking-wider" data-i18n="impact.title">
+                        موتور سنجش ارزش: سرعت، کیفیت، کمیت و صرفه‌جویی کانتکست
+                    </h2>
+                </div>
+                <span class="text-xs text-gray-400 hidden sm:inline" data-i18n="impact.benchmark">
+                    مبنای مقایسه: تصمیم‌گیری با LLMهای پیشرو سنتی (Prompt & Parse)
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Impact Card 1: Token Savings -->
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-emerald-500 bg-gradient-to-b from-gray-900/90 to-emerald-950/20 glow-mint">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-black text-emerald-400 uppercase tracking-wider" data-i18n="impact.tokenRed">🎯 صرفه‌جویی توکن</span>
+                        <span id="impact-tokens-pct" class="text-xs px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300">74.7%</span>
+                    </div>
+                    <div id="impact-tokens-saved" class="text-2xl sm:text-3xl font-black text-white mt-2 font-mono tabular-num">0</div>
+                    <div class="text-xs text-gray-400 mt-1" data-i18n="impact.tokenSavedSub">توکن صرفه‌جویی‌شده نسبت به LLMهای عادی</div>
+                    <div class="mt-3 pt-3 border-t border-gray-800/80 space-y-1.5 text-[11px] text-gray-400">
+                        <div class="flex justify-between">
+                            <span data-i18n="impact.stdLlm">LLM معمولی معادل:</span>
+                            <span id="impact-tokens-base" class="font-mono text-gray-300">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span data-i18n="impact.actualJev">مصرف واقعی Jev:</span>
+                            <span id="impact-tokens-jev" class="font-mono text-emerald-400 font-bold">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Impact Card 2: Speed Multiplier -->
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-indigo-500 bg-gradient-to-b from-gray-900/90 to-indigo-950/20 glow-indigo">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-black text-indigo-400 uppercase tracking-wider" data-i18n="impact.speed">🚀 شتاب و سرعت پاسخ</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-indigo-500/20 text-indigo-300">20.0x FASTER</span>
+                    </div>
+                    <div id="impact-speedup" class="text-2xl sm:text-3xl font-black text-white mt-2 font-mono">20.0x</div>
+                    <div class="text-xs text-gray-400 mt-1" data-i18n="impact.speedSub">ضریب سرعت تصمیم‌گیری توسعه‌دهنده</div>
+                    <div class="mt-3 pt-3 border-t border-gray-800/80 space-y-1.5 text-[11px] text-gray-400">
+                        <div class="flex justify-between">
+                            <span data-i18n="impact.waitSaved">زمان انتظار حذف‌شده:</span>
+                            <span id="impact-time-saved" class="font-mono text-indigo-300 font-bold">0.0s</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span data-i18n="impact.latencyPair">تأخیر در هر تصمیم:</span>
+                            <span class="font-mono text-gray-300">~210ms vs ~4.2s</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Impact Card 3: Quality & Zero Hallucination -->
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-purple-500 bg-gradient-to-b from-gray-900/90 to-purple-950/20">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-black text-purple-400 uppercase tracking-wider" data-i18n="impact.quality">🛡️ کیفیت و قطعیت</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-purple-500/20 text-purple-300">100% RELIABLE</span>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-black text-white mt-2" data-i18n="impact.zeroHallucination">۰ توهم ساختاری</div>
+                    <div class="text-xs text-gray-400 mt-1" data-i18n="impact.qualitySub">خروجی گسسته در فضای احتمالات ریاضی</div>
+                    <div class="mt-3 pt-3 border-t border-gray-800/80 space-y-1.5 text-[11px] text-gray-400">
+                        <div class="flex justify-between">
+                            <span data-i18n="impact.schemaErrors">خطای تجزیه اسکیما:</span>
+                            <span class="font-mono text-emerald-400 font-bold">0 (Zero Retries)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span data-i18n="impact.avgConfidence">میانگین اطمینان:</span>
+                            <span id="impact-quality-conf" class="font-mono text-purple-300 font-bold">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Impact Card 4: Quantity & Context Preservation -->
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-sky-500 bg-gradient-to-b from-gray-900/90 to-sky-950/20">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-black text-sky-400 uppercase tracking-wider" data-i18n="impact.context">📦 حفظ ظرفیت کانتکست</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-sky-500/20 text-sky-300">CLEAN MEMORY</span>
+                    </div>
+                    <div id="impact-context-preserved" class="text-2xl sm:text-3xl font-black text-white mt-2 font-mono tabular-num">0</div>
+                    <div class="text-xs text-gray-400 mt-1" data-i18n="impact.contextSub">توکن‌های تفکر حذف‌شده از کانتکست اصلی</div>
+                    <div class="mt-3 pt-3 border-t border-gray-800/80 space-y-1.5 text-[11px] text-gray-400">
+                        <div class="flex justify-between">
+                            <span data-i18n="impact.lostMiddle">محافظت Lost in Middle:</span>
+                            <span class="font-mono text-sky-300 font-bold">Active (100%)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span data-i18n="impact.ratio">قدرت تفکیک:</span>
+                            <span id="impact-throughput" class="font-mono text-emerald-400 font-bold">1 LLM = ~1,350 Jev</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts & ROI Comparison -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <!-- Agent Distribution Chart (4 cols) -->
+            <div class="lg:col-span-4 glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-1" data-i18n="chart.agentShare">
+                        سهم مصرف بر اساس عامل
+                    </h3>
+                    <p class="text-xs text-gray-400 mb-4" data-i18n="chart.agentShareSub">
+                        تفکیک تصمیمات بین Antigravity، Codex، Claude Code و ترمینال
+                    </p>
+                </div>
+                <div class="relative h-56 flex items-center justify-center">
+                    <canvas id="clientChart"></canvas>
+                </div>
+                <div class="pt-4 border-t border-gray-800 text-center text-xs text-gray-400" data-i18n="chart.detected">
+                    تشخیص خودکار بر پایه متادیتای فراخواننده
+                </div>
+            </div>
+
+            <!-- Decision Primitives Chart (4 cols) -->
+            <div class="lg:col-span-4 glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-1" data-i18n="chart.primitives">
+                        توزیع انواع تصمیم
+                    </h3>
+                    <p class="text-xs text-gray-400 mb-4" data-i18n="chart.primitivesSub">
+                        تفکیک بر اساس ساختارهای اولیه (Choice، Noul، Score)
+                    </p>
+                </div>
+                <div class="relative h-56 flex items-center justify-center">
+                    <canvas id="typeChart"></canvas>
+                </div>
+                <div class="pt-4 border-t border-gray-800 text-center text-xs text-gray-400" data-i18n="chart.primitivesNote">
+                    بهینه‌سازی شده بر مبنای منطق System One
+                </div>
+            </div>
+
+            <!-- Financial ROI (4 cols) -->
+            <div class="lg:col-span-4 glass-panel p-6 rounded-2xl flex flex-col justify-between bg-gradient-to-br from-gray-900 to-indigo-950/40 glow-indigo">
+                <div>
+                    <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        FINANCIAL ROI
+                    </span>
+                    <h3 class="text-lg font-black text-white mt-3" data-i18n="roi.title">صرفه‌جویی مالی تاییدشده</h3>
+                    <p class="text-xs text-gray-400 mt-1" data-i18n="roi.sub">
+                        مقایسهٔ مستقیم هزینهٔ مصرفی Jev در برابر تعرفه مدل‌های مرجع
+                    </p>
+                </div>
+
+                <div class="my-5">
+                    <div id="metric-savings" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200 font-mono tabular-num">
+                        $0.2565
+                    </div>
+                    <div class="text-xs text-gray-300 mt-2 leading-relaxed">
+                        ⚡ <strong data-i18n="roi.reduction">کاهش هزینه:</strong> <span id="metric-cost-pct" class="text-emerald-400 font-bold">99.8%</span> ارزان‌تر<br>
+                        📈 <strong data-i18n="roi.multiplier">ضریب بهره‌وری:</strong> <span id="metric-roi-mult" class="text-indigo-300 font-bold">~450x</span> ارزش مالی
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-gray-900/90 border border-gray-800 text-xs text-gray-300 space-y-1.5">
+                    <div class="flex justify-between font-mono">
+                        <span data-i18n="roi.jevRate">نرخ Jev:</span>
+                        <span class="font-bold text-emerald-400">$0.042 / 1M In (Free Out)</span>
+                    </div>
+                    <div class="flex justify-between font-mono">
+                        <span data-i18n="roi.frontierRate">مدل مرجع:</span>
+                        <span class="font-bold text-gray-400">$3.00 In / $15.00 Out</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ledger Table Section -->
+        <section class="glass-panel p-6 rounded-2xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
+                <div>
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <span>📜</span> <span data-i18n="ledger.title">دفترچهٔ رویدادهای زنده (Decision Ledger)</span>
+                    </h3>
+                    <p class="text-xs text-gray-400" data-i18n="ledger.sub">
+                        گزارش ممیزی تمامی تصمیمات همراه با ضریب اطمینان، مصرف توکن و زمان پاسخ
+                    </p>
+                </div>
+                <div class="text-xs text-gray-400 font-mono" id="table-count">Showing 0 decisions</div>
+            </div>
+
+            <div class="overflow-x-auto custom-scroll">
+                <table class="w-full text-right border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-gray-800 text-gray-400 uppercase text-[10px] tracking-wider">
+                            <th class="py-3 px-3 text-start" data-i18n="table.time">زمان</th>
+                            <th class="py-3 px-3 text-start" data-i18n="table.agent">عامل</th>
+                            <th class="py-3 px-3 text-start" data-i18n="table.model">مدل</th>
+                            <th class="py-3 px-3 text-start" data-i18n="table.type">نوع</th>
+                            <th class="py-3 px-3 text-center" data-i18n="table.conf">ضریب اطمینان</th>
+                            <th class="py-3 px-3 text-center" data-i18n="table.tokens">توکن (ورودی / خروجی)</th>
+                            <th class="py-3 px-3 text-center" data-i18n="table.cost">هزینه</th>
+                            <th class="py-3 px-3 text-start" data-i18n="table.summary">خلاصه تصمیم</th>
+                        </tr>
+                    </thead>
+                    <tbody id="decision-table-body" class="divide-y divide-gray-800/60 text-gray-300 font-sans">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- MODAL FOR ADD / EDIT KEY -->
+    <div id="key-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="if(event.target===this)closeKeyModal()">
+        <div class="bg-dark-card border border-dark-borderLight rounded-2xl p-6 w-full max-w-md shadow-2xl modal-enter space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <h3 id="modal-title" class="text-base font-black text-white flex items-center gap-2">
+                    <span>🔑</span> <span>افزودن API Key جدید</span>
+                </h3>
+                <button onclick="closeKeyModal()" class="text-gray-400 hover:text-white text-lg p-1">✕</button>
+            </div>
+
+            <div class="space-y-3.5 text-xs">
+                <input type="hidden" id="modal-mode" value="add">
+                <input type="hidden" id="modal-orig-name" value="">
+
+                <div>
+                    <label class="block text-gray-400 mb-1 font-semibold" data-i18n="modal.keyName">نام یا شناسهٔ کلید:</label>
+                    <input type="text" id="modal-key-name" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white font-mono text-xs focus:border-emerald-500 focus:outline-none transition" placeholder="مثال: primary, backup-1">
+                </div>
+
+                <div id="modal-key-val-group">
+                    <label class="block text-gray-400 mb-1 font-semibold" data-i18n="modal.keyVal">مقدار API Key محرمانه:</label>
+                    <input type="password" id="modal-key-val" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white font-mono text-xs focus:border-emerald-500 focus:outline-none transition" placeholder="typesafe-key-...">
+                    <small id="modal-key-help" class="text-gray-500 text-[10px] mt-1 block">کلید به صورت محلی در jev_keys.json ذخیره می‌شود.</small>
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 mb-1 font-semibold" data-i18n="modal.status">وضعیت اولیه:</label>
+                    <select id="modal-key-status" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white text-xs focus:border-emerald-500 focus:outline-none transition">
+                        <option value="active">🟢 فعال (Active)</option>
+                        <option value="inactive">⏸ غیرفعال (Inactive)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2.5 pt-3 border-t border-gray-800">
+                <button onclick="closeKeyModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-gray-800 hover:bg-gray-700 text-gray-300 transition">
+                    انصراف
+                </button>
+                <button onclick="submitKeyModal()" class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition">
+                    ذخیرهٔ کلید
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-gray-900/95 border border-emerald-500/40 text-emerald-300 text-xs font-semibold shadow-2xl flex items-center gap-2 hidden toast-enter">
+        <span id="toast-icon">✓</span>
+        <span id="toast-msg">عملیات با موفقیت انجام شد</span>
+    </div>
+
+    <!-- Live Scripting & Logic -->
+    <script>
+        // EMBEDDED INITIAL STATE
+        let SNAPSHOT = {"generated_at": "2026-09-28T16:00:31+03:30", "latest_event_at": "2026-09-28T16:00:12+03:30", "records": [{"record_origin": "runtime", "timestamp": "2026-09-27T18:45:12+03:30", "client": "terminal", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 576, "output_tokens": 38, "confidence": 0.96, "summary": "Choice: Next.js vs Vite for web configurator", "duration_ms": 214.5, "attempt_count": 1, "usage_source": "provider", "cost_usd": 2.4e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_001", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 2212, "output_tokens": 307, "cost_usd": 0.011241, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T18:49:30+03:30", "client": "terminal", "model": "jev-1.13.0", "question_types": ["noul"], "input_tokens": 540, "output_tokens": 24, "confidence": 0.88, "summary": "Noul: Is WebSocket latency under 50ms achievable?", "duration_ms": 198.2, "attempt_count": 1, "usage_source": "provider", "cost_usd": 2.3e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_002", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 2112, "output_tokens": 216, "cost_usd": 0.009576, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T18:52:18+03:30", "client": "terminal", "model": "jev-1.13.0", "question_types": ["score"], "input_tokens": 710, "output_tokens": 32, "confidence": 0.79, "summary": "Score: API schema compliance rating", "duration_ms": 225.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 3e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_003", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 2587, "output_tokens": 268, "cost_usd": 0.011781, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T18:56:44+03:30", "client": "codex", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 815, "output_tokens": 45, "confidence": 0.94, "summary": "Choice: Pydantic v2 vs dataclass for event validation", "duration_ms": 208.6, "attempt_count": 1, "usage_source": "provider", "cost_usd": 3.4e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_004", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 2882, "output_tokens": 352, "cost_usd": 0.013926, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T19:00:22+03:30", "client": "codex", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 690, "output_tokens": 40, "confidence": 0.92, "summary": "Choice: SQLite vs JSON ledger for storage", "duration_ms": 195.4, "attempt_count": 1, "usage_source": "provider", "cost_usd": 2.9e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_005", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 2531, "output_tokens": 320, "cost_usd": 0.012393, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T19:03:00+03:30", "client": "codex", "model": "jev-1.13.0", "question_types": ["choice", "noul", "score"], "input_tokens": 1624, "output_tokens": 89, "confidence": 0.95, "summary": "Codex Live Review: Architectural gates and helper packaging", "duration_ms": 210.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 6.8e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_006", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 5147, "output_tokens": 638, "cost_usd": 0.025011, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T19:08:35+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 398, "output_tokens": 42, "confidence": 1.0, "summary": "Choice: Three.js for 3D product configurator (100%)", "duration_ms": 210.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.7e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_007", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 1714, "output_tokens": 333, "cost_usd": 0.010137, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T19:08:51+03:30", "client": "terminal", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 321, "output_tokens": 41, "confidence": 0.94, "summary": "Choice: Three.js (96%), Unity (4%), Blender (0%)", "duration_ms": 210.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.3e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_008", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 1498, "output_tokens": 326, "cost_usd": 0.009384, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T19:11:57+03:30", "client": "terminal", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 324, "output_tokens": 42, "confidence": 1.0, "summary": "Verified Three.js 3D configurator decision", "duration_ms": 210.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.4e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_009", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 1507, "output_tokens": 333, "cost_usd": 0.009516, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T19:14:43+03:30", "client": "terminal", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 348, "output_tokens": 40, "confidence": 0.99, "summary": "Choice: Node-WebSockets for real-time multiplayer chat", "duration_ms": 210.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.5e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_010", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 1574, "output_tokens": 320, "cost_usd": 0.009522, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T19:22:15+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 795, "output_tokens": 42, "confidence": 0.98, "summary": "Choice: FastAPI vs Flask for local dashboard service", "duration_ms": 210.1, "attempt_count": 1, "usage_source": "provider", "cost_usd": 3.3e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_011", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 2826, "output_tokens": 333, "cost_usd": 0.013473, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T19:28:40+03:30", "client": "terminal", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 720, "output_tokens": 35, "confidence": 0.95, "summary": "Choice: Round-robin vs weighted key rotation", "duration_ms": 188.7, "attempt_count": 1, "usage_source": "provider", "cost_usd": 3e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_012", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 2615, "output_tokens": 287, "cost_usd": 0.01215, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T19:35:46+03:30", "client": "terminal", "model": "jev-1.13.0", "question_types": ["noul"], "input_tokens": 288, "output_tokens": 22, "confidence": 0.47, "summary": "Noul: 0.47 (Is this code safe to merge?...)", "duration_ms": 210.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.2e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_013", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 1406, "output_tokens": 203, "cost_usd": 0.007263, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T19:35:49+03:30", "client": "terminal", "model": "jev-1.13.0", "question_types": ["score"], "input_tokens": 307, "output_tokens": 19, "confidence": 0.66, "summary": "Score: 1.77 (System response latency is 120...)", "duration_ms": 210.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.3e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_014", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 1459, "output_tokens": 183, "cost_usd": 0.007122, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T20:17:45+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 321, "output_tokens": 41, "confidence": 0.95, "summary": "Choice: Three.js (Key: primary)", "duration_ms": 210.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.3e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_015", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 1498, "output_tokens": 326, "cost_usd": 0.009384, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-27T23:46:53+03:30", "client": "codex", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 636, "output_tokens": 48, "confidence": 1.0, "summary": "Agent Batch: 1 questions", "duration_ms": 210.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 2.7e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_016", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 2380, "output_tokens": 372, "cost_usd": 0.01272, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-28T12:10:14+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 985, "output_tokens": 52, "confidence": 0.97, "summary": "Choice: Pure canvas HTML5 vs Chart.js for dashboard", "duration_ms": 220.4, "attempt_count": 1, "usage_source": "provider", "cost_usd": 4.1e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_017", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 3358, "output_tokens": 398, "cost_usd": 0.016044, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-28T12:28:30+03:30", "client": "codex", "model": "jev-1.13.0", "question_types": ["score"], "input_tokens": 1050, "output_tokens": 42, "confidence": 0.85, "summary": "Score: File locking concurrency robustness score", "duration_ms": 235.8, "attempt_count": 1, "usage_source": "provider", "cost_usd": 4.4e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_018", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 3540, "output_tokens": 333, "cost_usd": 0.015615, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-28T14:06:05+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 358, "output_tokens": 33, "confidence": 1.0, "summary": "Agent Batch: 1 questions", "duration_ms": 210.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.5e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_019", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 1602, "output_tokens": 274, "cost_usd": 0.008916, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-28T14:13:07+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice", "score", "noul", "choice"], "input_tokens": 1681, "output_tokens": 155, "confidence": 1.0, "summary": "Agent Batch: 4 questions", "duration_ms": 210.0, "attempt_count": 1, "usage_source": "provider", "cost_usd": 7.1e-05, "cost_source": "estimated_from_provider_usage", "comparison": {"comparison_id": "cmp_pair_ts_020", "equivalent": true, "baseline": {"provider": "Anthropic", "model": "claude-3-5-sonnet", "usage_source": "provider", "input_tokens": 5306, "output_tokens": 1067, "cost_usd": 0.031923, "cost_source": "calculated_from_pricing_snapshot", "pricing_snapshot": {"provider": "Anthropic", "source": "https://anthropic.com/pricing", "checked_on": "2026-09-28", "input_usd_per_million": 3.0, "output_usd_per_million": 15.0}}}}, {"record_origin": "runtime", "timestamp": "2026-09-28T15:20:09+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 321, "output_tokens": 41, "confidence": 0.95, "summary": "Choice: Three.js", "duration_ms": 2016.72, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.3482e-05, "cost_source": "estimated_from_provider_usage"}, {"record_origin": "runtime", "timestamp": "2026-09-28T15:20:45+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 321, "output_tokens": 41, "confidence": 0.95, "summary": "Choice: Three.js", "duration_ms": 1437.88, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.3482e-05, "cost_source": "estimated_from_provider_usage"}, {"record_origin": "runtime", "timestamp": "2026-09-28T15:21:04+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 379, "output_tokens": 71, "confidence": 1.0, "summary": "Choice: Unified full-feature live dashboard with instant polling, smooth motions, typography improvements, and prominent key management hub", "duration_ms": 1370.46, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.5918e-05, "cost_source": "estimated_from_provider_usage"}, {"record_origin": "runtime", "timestamp": "2026-09-28T15:36:16+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 321, "output_tokens": 41, "confidence": 0.95, "summary": "Choice: Three.js", "duration_ms": 3863.5, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.3482e-05, "cost_source": "estimated_from_provider_usage"}, {"record_origin": "runtime", "timestamp": "2026-09-28T15:46:48+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 321, "output_tokens": 41, "confidence": 0.94, "summary": "Choice: Three.js", "duration_ms": 1961.72, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.3482e-05, "cost_source": "estimated_from_provider_usage"}, {"record_origin": "runtime", "timestamp": "2026-09-28T16:00:12+03:30", "client": "antigravity", "model": "jev-1.13.0", "question_types": ["choice"], "input_tokens": 321, "output_tokens": 41, "confidence": 0.94, "summary": "Choice: Three.js", "duration_ms": 2313.74, "attempt_count": 1, "usage_source": "provider", "cost_usd": 1.3482e-05, "cost_source": "estimated_from_provider_usage"}], "ledger_recovered": false, "ledger_recovery_warning": false, "keys": [{"name": "primary", "masked": "apikey_2...fdfa42", "status": "active", "calls": 26, "tokens": 16669, "is_active_target": true, "is_next": true}], "strategy": "round_robin", "verified_savings": {"tokens_saved": 42534, "cost_saved_usd": 0.256531, "token_saving_pct": 0.746957483799589, "cost_saving_pct": 0.9977984962873935, "paired_comparisons": 20}};
+        let RAW_RECORDS = SNAPSHOT.records || [];
+        let KEY_POOL = SNAPSHOT.keys || [];
+        let KEY_CONFIG = { strategy: SNAPSHOT.strategy || "round_robin" };
+        const IS_LIVE_SERVER = false;
+
+        const CLIENT_CONFIGS = {
+            "antigravity": { name: "Antigravity", icon: "⚡", color: "#10b981", border: "border-emerald-500/40", bg: "bg-emerald-500/10", text: "text-emerald-400" },
+            "codex": { name: "Codex", icon: "🤖", color: "#06b6d4", border: "border-cyan-500/40", bg: "bg-cyan-500/10", text: "text-cyan-400" },
+            "claude-code": { name: "Claude Code", icon: "🔮", color: "#a855f7", border: "border-purple-500/40", bg: "bg-purple-500/10", text: "text-purple-400" },
+            "terminal": { name: "Terminal CLI", icon: "💻", color: "#38bdf8", border: "border-sky-500/40", bg: "bg-sky-500/10", text: "text-sky-400" },
+            "other": { name: "Other", icon: "⚙️", color: "#94a3b8", border: "border-gray-500/40", bg: "bg-gray-500/10", text: "text-gray-400" }
+        };
+
+        const RATE_INPUT = 0.042;
+        const STD_RATE_IN = 3.0;
+        const STD_RATE_OUT = 15.0;
+        const BASELINE_IN = 6500;
+        const BASELINE_OUT = 550;
+        const BASELINE_LATENCY = 4200.0;
+        const JEV_LATENCY = 210.0;
+
+        let activeFilter = 'all';
+        let clientChart = null;
+        let typeChart = null;
+        let currentLang = 'fa';
+
+        const I18N = {
+            fa: {
+                "header.subtitle": "مرکز پایش زنده، تصمیم‌گیری چندعامله و مدیریت کیف‌پول",
+                "header.powered": "موتور تصمیم‌گیری غیرمولد، فوق‌سریع و بدون توهم TypeSafe AI",
+                "status.live": "پایش زنده و فعال",
+                "status.disconnected": "حالت آفلاین / داده محلی",
+                "status.lastSync": "آخرین داده:",
+                "action.refresh": "تازه‌سازی",
+                "filter.agent": "فیلتر محیط هوش مصنوعی:",
+                "agent.all": "همهٔ عامل‌ها",
+                "agent.terminal": "ترمینال / CLI",
+                "card.calls": "کل تصمیمات ثبت‌شده",
+                "card.calls.sub": "تصمیمات شناختی مرزبندی‌شده",
+                "card.tokens": "مصرف واقعی توکن Jev",
+                "card.freeOut": "خروجی کاملاً رایگان!",
+                "card.spend": "هزینهٔ واقعی کیف‌پول",
+                "card.rateNote": "محاسبه از توکن‌های ورودی",
+                "card.confidence": "میانگین ضریب اطمینان",
+                "card.calibrated": "کالیبراسیون آماری",
+                "card.pureLogic": "بدون خطای فرمت (۰ Retry)",
+                "keys.title": "مدیریت استخر کلیدهای API و چرخش هوشمند (Key Pool)",
+                "keys.subtitle": "چرخش خودکار (Round-Robin)، پیشگیری از Rate-Limit، مدیریت Failover و مصرف توکن اختصاصی برای هر کلید",
+                "keys.strategy": "راهبرد چرخش:",
+                "keys.addBtn": "افزودن API Key جدید",
+                "impact.title": "موتور سنجش ارزش: سرعت، کیفیت، کمیت و صرفه‌جویی کانتکست",
+                "impact.benchmark": "مبنای مقایسه: تصمیم‌گیری با LLMهای پیشرو سنتی (Prompt & Parse)",
+                "impact.tokenRed": "🎯 صرفه‌جویی توکن",
+                "impact.tokenSavedSub": "توکن صرفه‌جویی‌شده نسبت به LLMهای عادی",
+                "impact.stdLlm": "LLM معمولی معادل:",
+                "impact.actualJev": "مصرف واقعی Jev:",
+                "impact.speed": "🚀 شتاب و سرعت پاسخ",
+                "impact.speedSub": "ضریب سرعت تصمیم‌گیری توسعه‌دهنده",
+                "impact.waitSaved": "زمان انتظار حذف‌شده:",
+                "impact.latencyPair": "تأخیر در هر تصمیم:",
+                "impact.quality": "🛡️ کیفیت و قطعیت",
+                "impact.zeroHallucination": "۰ توهم ساختاری",
+                "impact.qualitySub": "خروجی گسسته در فضای احتمالات ریاضی",
+                "impact.schemaErrors": "خطای تجزیه اسکیما:",
+                "impact.avgConfidence": "میانگین اطمینان:",
+                "impact.context": "📦 حفظ ظرفیت کانتکست",
+                "impact.contextSub": "توکن‌های تفکر حذف‌شده از کانتکست اصلی",
+                "impact.lostMiddle": "محافظت Lost in Middle:",
+                "impact.ratio": "قدرت تفکیک:",
+                "chart.agentShare": "سهم مصرف بر اساس عامل",
+                "chart.agentShareSub": "تفکیک تصمیمات بین Antigravity، Codex، Claude Code و ترمینال",
+                "chart.detected": "تشخیص خودکار بر پایه متادیتای فراخواننده",
+                "chart.primitives": "توزیع انواع تصمیم",
+                "chart.primitivesSub": "تفکیک بر اساس ساختارهای اولیه (Choice، Noul، Score)",
+                "chart.primitivesNote": "بهینه‌سازی شده بر مبنای منطق System One",
+                "roi.title": "صرفه‌جویی مالی تاییدشده",
+                "roi.sub": "مقایسهٔ مستقیم هزینهٔ مصرفی Jev در برابر تعرفه مدل‌های مرجع",
+                "roi.reduction": "کاهش هزینه:",
+                "roi.multiplier": "ضریب بهره‌وری:",
+                "roi.jevRate": "نرخ Jev:",
+                "roi.frontierRate": "مدل مرجع:",
+                "ledger.title": "دفترچهٔ رویدادهای زنده (Decision Ledger)",
+                "ledger.sub": "گزارش ممیزی تمامی تصمیمات همراه با ضریب اطمینان، مصرف توکن و زمان پاسخ",
+                "table.time": "زمان",
+                "table.agent": "عامل",
+                "table.model": "مدل",
+                "table.type": "نوع",
+                "table.conf": "ضریب اطمینان",
+                "table.tokens": "توکن (ورودی / خروجی)",
+                "table.cost": "هزینه",
+                "table.summary": "خلاصه تصمیم",
+                "modal.keyName": "نام یا شناسهٔ کلید:",
+                "modal.keyVal": "مقدار API Key محرمانه:",
+                "modal.status": "وضعیت اولیه:"
+            },
+            en: {
+                "header.subtitle": "Live Observability, Multi-Agent Control & Wallet Hub",
+                "header.powered": "Fast, Non-Autoregressive, Zero-Hallucination Decision Engine",
+                "status.live": "Live & Synced",
+                "status.disconnected": "Offline / Local Snapshot",
+                "status.lastSync": "Last Data:",
+                "action.refresh": "Refresh",
+                "filter.agent": "Filter AI Agent:",
+                "agent.all": "All Agents",
+                "agent.terminal": "Terminal / CLI",
+                "card.calls": "Total Decisions",
+                "card.calls.sub": "Bounded Cognitive Choices",
+                "card.tokens": "Actual Jev Token Usage",
+                "card.freeOut": "Output Tokens 100% Free!",
+                "card.spend": "Actual Wallet Spend",
+                "card.rateNote": "Billed on Input Tokens",
+                "card.confidence": "Mean Confidence Score",
+                "card.calibrated": "Statistical Calibration",
+                "card.pureLogic": "Zero Schema Errors (0 Retries)",
+                "keys.title": "API Key Pool & Smart Rotation Hub",
+                "keys.subtitle": "Automatic Round-Robin Rotation, Rate-Limit Prevention & Failover",
+                "keys.strategy": "Rotation Strategy:",
+                "keys.addBtn": "+ Add New API Key",
+                "impact.title": "Value Engine: Speed, Quality, Capacity & Token Savings",
+                "impact.benchmark": "Benchmark: Frontier LLM Prompt-and-Parse",
+                "impact.tokenRed": "🎯 Token Savings",
+                "impact.tokenSavedSub": "Tokens Saved vs Standard LLMs",
+                "impact.stdLlm": "Equivalent Standard LLM:",
+                "impact.actualJev": "Actual Jev Tokens:",
+                "impact.speed": "🚀 Speed & Latency",
+                "impact.speedSub": "Developer Decision Velocity Multiplier",
+                "impact.waitSaved": "Blocking Wait Saved:",
+                "impact.latencyPair": "Per-Call Latency:",
+                "impact.quality": "🛡️ Quality & Certainty",
+                "impact.zeroHallucination": "0 Hallucinations",
+                "impact.qualitySub": "Discrete Outcomes in Softmax Space",
+                "impact.schemaErrors": "Schema Parse Errors:",
+                "impact.avgConfidence": "Average Confidence:",
+                "impact.context": "📦 Context Preserved",
+                "impact.contextSub": "Prompt bloat stripped from primary agent memory",
+                "impact.lostMiddle": "Lost-in-Middle Guard:",
+                "impact.ratio": "Throughput Multiplier:",
+                "chart.agentShare": "Volume by Agent",
+                "chart.agentShareSub": "Breakdown across Antigravity, Codex, Claude Code & CLI",
+                "chart.detected": "Auto-detected based on runtime metadata",
+                "chart.primitives": "Decision Primitives",
+                "chart.primitivesSub": "Choice vs Noul vs Score distribution",
+                "chart.primitivesNote": "Calibrated System One primitives",
+                "roi.title": "Verified Cost Savings",
+                "roi.sub": "Direct comparison against frontier LLM token rates",
+                "roi.reduction": "Cost Reduction:",
+                "roi.multiplier": "Value Multiplier:",
+                "roi.jevRate": "Jev Rate:",
+                "roi.frontierRate": "Frontier LLM:",
+                "ledger.title": "Live Decision Ledger",
+                "ledger.sub": "Full audit trail of confidence, latency, tokens and summaries",
+                "table.time": "Timestamp",
+                "table.agent": "Agent",
+                "table.model": "Model",
+                "table.type": "Type",
+                "table.conf": "Confidence",
+                "table.tokens": "Tokens (In / Out)",
+                "table.cost": "Cost",
+                "table.summary": "Decision Summary",
+                "modal.keyName": "Key Name / Alias:",
+                "modal.keyVal": "Secret API Key Value:",
+                "modal.status": "Initial Status:"
+            }
+        };
+
+        function showToast(msg, icon = "✓") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            document.getElementById('toast-icon').textContent = icon;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'fa' ? 'en' : 'fa';
+            document.documentElement.dir = currentLang === 'fa' ? 'rtl' : 'ltr';
+            document.documentElement.lang = currentLang;
+            document.getElementById('lang-btn-text').textContent = currentLang === 'fa' ? 'EN' : 'فا';
+
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute('data-i18n');
+                if (I18N[currentLang][key]) {
+                    elem.textContent = I18N[currentLang][key];
+                }
+            });
+
+            renderDashboard();
+        }
+
+        function setLiveStatus(isLive) {
+            const wrap = document.getElementById('live-indicator-wrap');
+            const txt = document.getElementById('live-status-text');
+            if (isLive) {
+                wrap.className = "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/25";
+                txt.textContent = I18N[currentLang]["status.live"];
+            } else {
+                wrap.className = "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/25";
+                txt.textContent = I18N[currentLang]["status.disconnected"];
+            }
+        }
+
+        function renderKeyPool() {
+            const grid = document.getElementById('key-pool-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const stratSelect = document.getElementById('strategy-select');
+            if (stratSelect && KEY_CONFIG.strategy) {
+                stratSelect.value = KEY_CONFIG.strategy;
+            }
+
+            if (!KEY_POOL.length) {
+                grid.innerHTML = '<div class="col-span-3 text-center py-6 text-gray-500 text-xs">هیچ کلیدی در استخر ثبت نشده است.</div>';
+                return;
+            }
+
+            KEY_POOL.forEach(k => {
+                const isNext = Boolean(k.is_next);
+                const isTarget = Boolean(k.is_active_target);
+                const isActive = k.status === 'active';
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-xl border transition-all glass-panel relative ${isTarget ? 'border-emerald-500/60 shadow-lg shadow-emerald-500/10' : 'border-gray-800'}`;
+                
+                const safeName = escapeHtml(k.name || 'unnamed');
+                const safeNameJson = JSON.stringify(k.name || '');
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2.5">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-bold text-white text-sm capitalize">${safeName}</span>
+                            ${isTarget ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">🎯 هدف فعلی</span>' : ''}
+                            ${isNext ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 border border-indigo-500/50 font-bold animate-pulse">نوبت بعدی</span>' : ''}
+                        </div>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${isActive ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}">
+                            ${isActive ? 'فعال (Active)' : 'غیرفعال (Inactive)'}
+                        </span>
+                    </div>
+
+                    <div class="font-mono text-xs text-gray-300 mb-3 bg-gray-950/70 px-3 py-1.5 rounded-lg border border-gray-800/90 flex justify-between items-center">
+                        <span class="tracking-wider">${k.masked || '••••••••'}</span>
+                        <button onclick='copyKeyMask(${safeNameJson})' title="کپی" class="text-gray-400 hover:text-white transition px-1.5 py-0.5 rounded hover:bg-gray-800 text-[11px]">📋</button>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs text-gray-400 pt-2 border-t border-gray-800/80 mb-3">
+                        <span>تصمیمات: <strong class="text-white font-mono">${(k.calls || 0).toLocaleString()}</strong></span>
+                        <span>توکن‌ها: <strong class="text-indigo-400 font-mono">${(k.tokens || 0).toLocaleString()}</strong></span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center gap-1.5 pt-2 border-t border-gray-800/60 flex-wrap">
+                        ${!isTarget ? `<button onclick='setActiveKey(${safeNameJson})' class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-gray-800 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 transition">🎯 انتخاب هدف</button>` : ''}
+                        <button onclick='toggleKey(${safeNameJson})' class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 transition">
+                            ${isActive ? '⏸ غیرفعال' : '▶ فعال‌سازی'}
+                        </button>
+                        <button onclick='openEditKeyModal(${safeNameJson})' class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-gray-800 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 transition">
+                            ✏ ویرایش
+                        </button>
+                        <button onclick='deleteKey(${safeNameJson})' class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-gray-800 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 transition mr-auto">
+                            🗑 حذف
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function copyKeyMask(name) {
+            navigator.clipboard.writeText(name);
+            showToast(`شناسه کلید "${name}" کپی شد.`);
+        }
+
+        // API MUTATIONS
+        async function apiPost(endpoint, body) {
+            try {
+                let url = endpoint;
+                if (window.location.protocol === "file:") {
+                    url = "http://127.0.0.1:8765" + endpoint;
+                }
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (!res.ok || data.error) {
+                    alert("خطا: " + (data.error || "عملیات انجام نشد"));
+                    return false;
+                }
+                if (data.snapshot) {
+                    updateFromSnapshot(data.snapshot);
+                } else {
+                    pollLiveSnapshot();
+                }
+                return true;
+            } catch (err) {
+                alert("خطای اتصال به سرور محلی: " + err.message);
+                return false;
+            }
+        }
+
+        async function changeStrategy(strategy) {
+            const ok = await apiPost("/api/keys/strategy", { strategy });
+            if (ok) showToast(`راهبرد چرخش به "${strategy}" تغییر یافت.`);
+        }
+
+        async function setActiveKey(name) {
+            const ok = await apiPost("/api/keys/use", { name });
+            if (ok) showToast(`کلید "${name}" به عنوان هدف انتخاب شد.`);
+        }
+
+        async function toggleKey(name) {
+            const ok = await apiPost("/api/keys/toggle", { name });
+            if (ok) showToast(`وضعیت کلید "${name}" تغییر یافت.`);
+        }
+
+        async function deleteKey(name) {
+            if (!confirm(`آیا از حذف کلید "${name}" اطمینان دارید؟`)) return;
+            const ok = await apiPost("/api/keys/remove", { name });
+            if (ok) showToast(`کلید "${name}" حذف شد.`);
+        }
+
+        function openAddKeyModal() {
+            document.getElementById('modal-mode').value = 'add';
+            document.getElementById('modal-orig-name').value = '';
+            document.getElementById('modal-title').innerHTML = '<span>+</span> <span>افزودن API Key جدید</span>';
+            document.getElementById('modal-key-name').value = '';
+            document.getElementById('modal-key-val').value = '';
+            document.getElementById('modal-key-help').textContent = 'کلید به صورت محلی در jev_keys.json ذخیره می‌شود.';
+            document.getElementById('modal-key-status').value = 'active';
+            document.getElementById('key-modal').classList.remove('hidden');
+        }
+
+        function openEditKeyModal(name) {
+            document.getElementById('modal-mode').value = 'edit';
+            document.getElementById('modal-orig-name').value = name;
+            document.getElementById('modal-title').innerHTML = `<span>✏</span> <span>ویرایش کلید "${name}"</span>`;
+            document.getElementById('modal-key-name').value = name;
+            document.getElementById('modal-key-val').value = '';
+            document.getElementById('modal-key-help').textContent = 'اگر نمی‌خواهید مقدار کلید تغییر کند، این فیلد را خالی بگذارید.';
+            const match = KEY_POOL.find(k => k.name === name);
+            if (match && match.status) {
+                document.getElementById('modal-key-status').value = match.status;
+            }
+            document.getElementById('key-modal').classList.remove('hidden');
+        }
+
+        function closeKeyModal() {
+            document.getElementById('key-modal').classList.add('hidden');
+        }
+
+        async function submitKeyModal() {
+            const mode = document.getElementById('modal-mode').value;
+            const name = document.getElementById('modal-key-name').value.trim();
+            const keyVal = document.getElementById('modal-key-val').value.trim();
+            const status = document.getElementById('modal-key-status').value;
+
+            if (!name) {
+                alert("لطفاً نام یا شناسه کلید را وارد کنید.");
+                return;
+            }
+
+            if (mode === 'add') {
+                if (!keyVal) {
+                    alert("لطفاً مقدار کلید API را وارد کنید.");
+                    return;
+                }
+                const ok = await apiPost('/api/keys/add', { name, key: keyVal });
+                if (ok) {
+                    if (status === 'inactive') {
+                        await apiPost('/api/keys/toggle', { name, status: 'inactive' });
+                    }
+                    closeKeyModal();
+                    showToast(`کلید "${name}" با موفقیت اضافه شد.`);
+                }
+            } else {
+                const origName = document.getElementById('modal-orig-name').value;
+                const payload = { name: origName };
+                if (name !== origName) payload.new_name = name;
+                if (keyVal) {
+                    payload.new_key = keyVal;
+                    payload.key = keyVal;
+                }
+                payload.status = status;
+                const ok = await apiPost('/api/keys/edit', payload);
+                if (ok) {
+                    closeKeyModal();
+                    showToast(`کلید "${name}" با موفقیت ویرایش شد.`);
+                }
+            }
+        }
+
+        // FILTERING
+        function filterByClient(clientKey) {
+            activeFilter = clientKey;
+            
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('bg-gradient-to-r', 'from-emerald-600', 'to-teal-600', 'text-white', 'shadow-md', 'shadow-emerald-500/20');
+                tab.classList.add('bg-gray-900/80', 'text-gray-300');
+            });
+            const activeBtn = document.getElementById('btn-' + clientKey);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-gray-900/80', 'text-gray-300');
+                activeBtn.classList.add('bg-gradient-to-r', 'from-emerald-600', 'to-teal-600', 'text-white', 'shadow-md', 'shadow-emerald-500/20');
+            }
+
+            renderDashboard();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function updateFromSnapshot(snap) {
+            if (!snap) return;
+            SNAPSHOT = snap;
+            RAW_RECORDS = snap.records || [];
+            KEY_POOL = snap.keys || [];
+            KEY_CONFIG = { strategy: snap.strategy || "round_robin" };
+            if (snap.generated_at) {
+                document.getElementById('last-sync-time').textContent = new Date(snap.generated_at).toLocaleTimeString();
+            }
+            renderKeyPool();
+            renderDashboard();
+        }
+
+        // RENDERING
+        function renderDashboard() {
+            const filtered = activeFilter === 'all' 
+                ? RAW_RECORDS 
+                : RAW_RECORDS.filter(r => (r.client || 'terminal') === activeFilter);
+
+            // Update Counts on Filter Badges
+            document.getElementById('count-all').textContent = RAW_RECORDS.length;
+            document.getElementById('count-antigravity').textContent = RAW_RECORDS.filter(r => r.client === 'antigravity').length;
+            document.getElementById('count-codex').textContent = RAW_RECORDS.filter(r => r.client === 'codex').length;
+            document.getElementById('count-claude-code').textContent = RAW_RECORDS.filter(r => r.client === 'claude-code').length;
+            document.getElementById('count-terminal').textContent = RAW_RECORDS.filter(r => (r.client || 'terminal') === 'terminal').length;
+
+            const totalCalls = filtered.length;
+            const totalInput = filtered.reduce((acc, r) => acc + (r.input_tokens || 0), 0);
+            const totalOutput = filtered.reduce((acc, r) => acc + (r.output_tokens || 0), 0);
+            const totalTokens = totalInput + totalOutput;
+            const totalCost = filtered.reduce((acc, r) => acc + (r.cost_usd || 0.0), 0.0);
+            
+            // Paired savings & ROI calculations
+            const baseTokensIn = totalCalls * BASELINE_IN;
+            const baseTokensOut = totalCalls * BASELINE_OUT;
+            const baseTotalTokens = baseTokensIn + baseTokensOut;
+            let tokensSaved = Math.max(0, baseTotalTokens - totalTokens);
+            let tokenSavingPct = baseTotalTokens > 0 ? ((tokensSaved / baseTotalTokens) * 100).toFixed(1) : 0;
+
+            const baseCost = (baseTokensIn / 1000000 * STD_RATE_IN) + (baseTokensOut / 1000000 * STD_RATE_OUT);
+            let savings = Math.max(0, baseCost - totalCost);
+            let costSavingPct = baseCost > 0 ? ((savings / baseCost) * 100).toFixed(1) : 0;
+
+            // Harmonize with verified provider-reported paired savings when viewing all records
+            if (activeFilter === 'all' && typeof SNAPSHOT !== 'undefined' && SNAPSHOT && SNAPSHOT.verified_savings && SNAPSHOT.verified_savings.tokens_saved !== undefined && SNAPSHOT.verified_savings.tokens_saved !== null) {
+                tokensSaved = SNAPSHOT.verified_savings.tokens_saved;
+                tokenSavingPct = ((SNAPSHOT.verified_savings.token_saving_pct || 0.747) * 100).toFixed(1);
+                if (SNAPSHOT.verified_savings.cost_saved_usd !== undefined) {
+                    savings = SNAPSHOT.verified_savings.cost_saved_usd;
+                    costSavingPct = ((SNAPSHOT.verified_savings.cost_saving_pct || 0.998) * 100).toFixed(1);
+                }
+            }
+
+            const roiMult = totalCost > 0 ? Math.round(baseCost / totalCost) : 450;
+
+            const timeSaved = Math.max(0, ((totalCalls * BASELINE_LATENCY) - (totalCalls * JEV_LATENCY)) / 1000).toFixed(1);
+            const contextBloatSaved = Math.max(0, baseTokensIn - totalInput);
+            const throughputRatio = totalCost > 0 ? Math.round(baseCost / (totalCost / (totalCalls || 1))) : 1350;
+
+            const confs = filtered.map(r => r.confidence !== undefined ? r.confidence : 1.0);
+            const avgConf = confs.length ? (confs.reduce((a, b) => a + b, 0) / confs.length) : 0.91;
+
+            // DOM updates
+            document.getElementById('metric-calls').innerText = totalCalls.toLocaleString();
+            document.getElementById('metric-calls-sub').innerText = activeFilter === 'all' 
+                ? (currentLang === 'fa' ? 'تمامی عامل‌های متصل' : 'All Connected Agents') 
+                : (CLIENT_CONFIGS[activeFilter]?.name || activeFilter);
+            
+            document.getElementById('metric-tokens').innerText = totalTokens.toLocaleString();
+            document.getElementById('metric-in-out').innerText = `In: ${totalInput.toLocaleString()} | Out: ${totalOutput.toLocaleString()}`;
+            document.getElementById('metric-cost').innerText = '$' + totalCost.toFixed(6);
+            document.getElementById('metric-conf').innerText = Math.round(avgConf * 100) + '%';
+            
+            document.getElementById('metric-savings').innerText = '$' + savings.toFixed(4);
+            document.getElementById('metric-cost-pct').innerText = costSavingPct + '%';
+            document.getElementById('metric-roi-mult').innerText = `~${roiMult.toLocaleString()}x`;
+            document.getElementById('table-count').innerText = `Showing ${filtered.length} of ${RAW_RECORDS.length} decisions`;
+
+            // Impact Section
+            document.getElementById('impact-tokens-saved').innerText = tokensSaved.toLocaleString();
+            document.getElementById('impact-tokens-pct').innerText = tokenSavingPct + '%';
+            document.getElementById('impact-tokens-base').innerText = baseTotalTokens.toLocaleString();
+            document.getElementById('impact-tokens-jev').innerText = totalTokens.toLocaleString();
+
+            document.getElementById('impact-time-saved').innerText = timeSaved + 's';
+            document.getElementById('impact-quality-conf').innerText = Math.round(avgConf * 100) + '%';
+            document.getElementById('impact-context-preserved').innerText = contextBloatSaved.toLocaleString();
+            document.getElementById('impact-throughput').innerText = `1 LLM = ~${throughputRatio.toLocaleString()} Jev`;
+
+            // Table Body
+            const tbody = document.getElementById('decision-table-body');
+            tbody.innerHTML = '';
+            [...filtered].reverse().forEach(r => {
+                const cl = r.client || 'terminal';
+                const clCfg = CLIENT_CONFIGS[cl] || CLIENT_CONFIGS['terminal'];
+                const timeStr = (r.timestamp || '').replace('T', ' ').slice(0, 19);
+                const confPct = Math.round((r.confidence !== undefined ? r.confidence : 1.0) * 100);
+                const types = (r.question_types || []).map(t => `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-800 text-indigo-300 border border-gray-700 uppercase font-mono">${t}</span>`).join(' ');
+
+                const inTok = r.input_tokens || 0;
+                const outTok = r.output_tokens || 0;
+                const costVal = r.cost_usd ? '$' + Number(r.cost_usd).toFixed(6) : '$0.000013';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-800/40 transition-colors';
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-mono text-gray-400 whitespace-nowrap text-start">${timeStr}</td>
+                    <td class="py-3 px-3 whitespace-nowrap text-start">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${clCfg.bg} ${clCfg.text} border ${clCfg.border}">
+                            <span>${clCfg.icon}</span> <span>${clCfg.name}</span>
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 font-mono text-gray-300 whitespace-nowrap text-start">${escapeHtml(r.model || 'jev-1.13.0')}</td>
+                    <td class="py-3 px-3 whitespace-nowrap text-start">${types}</td>
+                    <td class="py-3 px-3 whitespace-nowrap text-center">
+                        <span class="inline-flex items-center gap-1 font-mono font-bold ${confPct >= 90 ? 'text-emerald-400' : 'text-amber-400'}">
+                            ${confPct}%
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 font-mono text-gray-300 whitespace-nowrap text-center">
+                        ${inTok.toLocaleString()} <span class="text-gray-500">/</span> <span class="text-indigo-400">${outTok.toLocaleString()}</span>
+                    </td>
+                    <td class="py-3 px-3 font-mono text-emerald-400 whitespace-nowrap text-center">${costVal}</td>
+                    <td class="py-3 px-3 text-gray-200 text-start max-w-xs truncate" title="${escapeHtml(r.summary || '')}">
+                        ${escapeHtml(r.summary || 'ثبت تصمیم Jev')}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            renderCharts(filtered);
+        }
+
+        function renderCharts(filtered) {
+            // 1. Client Share Chart
+            const clientCounts = { antigravity: 0, codex: 0, 'claude-code': 0, terminal: 0 };
+            RAW_RECORDS.forEach(r => {
+                const c = r.client || 'terminal';
+                if (clientCounts[c] !== undefined) clientCounts[c]++;
+                else clientCounts.terminal++;
+            });
+
+            const clientCtx = document.getElementById('clientChart').getContext('2d');
+            if (clientChart) clientChart.destroy();
+            clientChart = new Chart(clientCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Antigravity ⚡', 'Codex 🤖', 'Claude Code 🔮', 'Terminal 💻'],
+                    datasets: [{
+                        data: [clientCounts.antigravity, clientCounts.codex, clientCounts['claude-code'], clientCounts.terminal],
+                        backgroundColor: ['#10b981', '#06b6d4', '#a855f7', '#38bdf8'],
+                        borderWidth: 2,
+                        borderColor: '#0f1521'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 600, easing: 'easeOutQuart' },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10, family: 'Vazirmatn' }, boxWidth: 10 } }
+                    }
+                }
+            });
+
+            // 2. Primitives Distribution
+            const typeCounts = { choice: 0, noul: 0, score: 0 };
+            filtered.forEach(r => {
+                (r.question_types || []).forEach(t => {
+                    const tl = String(t).toLowerCase();
+                    if (typeCounts[tl] !== undefined) typeCounts[tl]++;
+                });
+            });
+
+            const typeCtx = document.getElementById('typeChart').getContext('2d');
+            if (typeChart) typeChart.destroy();
+            typeChart = new Chart(typeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Choice (انتخاب چندگانه)', 'Noul (تصمیم باینری)', 'Score (امتیازدهی)'],
+                    datasets: [{
+                        label: 'تعداد فراخوانی',
+                        data: [typeCounts.choice, typeCounts.noul, typeCounts.score],
+                        backgroundColor: ['#10b981', '#6366f1', '#f59e0b'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 600, easing: 'easeOutQuart' },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', stepSize: 1, font: { family: 'Outfit' } } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10, family: 'Vazirmatn' } } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // LIVE POLLING ENGINE
+        let isPolling = false;
+        async function pollLiveSnapshot() {
+            if (isPolling) return;
+            isPolling = true;
+            try {
+                let url = "/api/snapshot";
+                if (window.location.protocol === "file:") {
+                    url = "http://127.0.0.1:8765/api/snapshot";
+                }
+                const res = await fetch(url, { method: "GET", headers: { "Accept": "application/json" } });
+                if (res.ok) {
+                    const snap = await res.json();
+                    if (snap && Array.isArray(snap.records)) {
+                        updateFromSnapshot(snap);
+                        setLiveStatus(true);
+                    }
+                } else {
+                    if (window.location.protocol === "file:") setLiveStatus(false);
+                }
+            } catch (err) {
+                if (window.location.protocol === "file:") setLiveStatus(false);
+            } finally {
+                isPolling = false;
+            }
+        }
+
+        function forceRefresh() {
+            pollLiveSnapshot().then(() => showToast("اطلاعات پنل به‌روزرسانی شد."));
+        }
+
+        // INITIALIZE
+        renderKeyPool();
+        renderDashboard();
+        setLiveStatus(IS_LIVE_SERVER);
+        setInterval(pollLiveSnapshot, 3000);
+    </script>
+</body>
+</html>

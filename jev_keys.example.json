@@ -1,0 +1,15 @@
+{
+  "strategy": "round_robin",
+  "active_key_name": "primary",
+  "current_index": 0,
+  "keys": [
+    {
+      "name": "primary",
+      "key": "typesafe_your_api_key_here",
+      "status": "active",
+      "added_at": "2026-09-28T00:00:00Z",
+      "calls": 0,
+      "tokens": 0
+    }
+  ]
+}

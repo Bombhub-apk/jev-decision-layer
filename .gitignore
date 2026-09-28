@@ -1,0 +1,23 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Sensitive user credentials & local runtime ledger
+jev_keys.json
+jev_usage_ledger.json
+*.bak
+.corrupt-*
+*.log
+.env
+.env.*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
