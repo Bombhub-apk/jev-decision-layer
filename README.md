@@ -39,6 +39,20 @@ Autonomous agent workflows spend millions of tokens calling large foundational m
 
 ---
 
+## 🎬 Official Launch Teaser & Dashboard Demo
+
+<div align="center">
+
+<a href="assets/media/jev-launch-demo.mp4">
+  <img src="assets/media/jev-launch-poster.jpg" alt="Jev Decision Layer Launch Video" width="100%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+</a>
+
+*▶️ Click on the preview image above to watch or download the 1080p Full HD launch teaser video (`assets/media/jev-launch-demo.mp4`).*
+
+</div>
+
+---
+
 ## 🏗️ Architecture Blueprint
 
 ```mermaid
@@ -223,6 +237,14 @@ $$\text{Cost Saved USD} = \sum_{i \in \text{valid\_pairs}} (\text{Cost}_{\text{b
 3. **تأخیر زیر ۲۵۰ میلی‌ثانیه**: سرعت پاسخ‌دهی آنی (p50: 210ms) در مقایسه با ۲۵۰۰ میلی‌ثانیه در مدل‌های بزرگ.
 4. **استخر چرخشی کلیدها (Key Pool)**: امکان افزودن چند API Key، توزیع چرخشی بار (Round-Robin) و سوئیچ خودکار در زمان بروز خطا (Failover).
 5. **داشبورد زنده و مانیتورینگ بلادرنگ**: وب‌اپلیکیشن شیشه‌ای (Glassmorphism) با به‌روزرسانی زنده هر ۳ ثانیه، انیمیشن نرم ارقام، فونت‌های بومی وزیرمتن و استعداد، و تفکیک مصرف بر اساس ایجنت‌ها.
+
+### 🎬 تیزر رسمی و پیش‌نمایش ویدیویی موشن
+<div align="center">
+  <a href="assets/media/jev-launch-demo.mp4">
+    <img src="assets/media/jev-launch-poster.jpg" alt="پیش‌نمایش ویدیو تیزر Jev" width="90%" style="border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);" />
+  </a>
+  <p><i>▶️ جهت مشاهده یا دانلود ویدیوی تیزر لانچ با کیفیت Full HD 1080p روی تصویر بالا کلیک نمایید.</i></p>
+</div>
 
 ### دستورات سریع در ترمینال
 
